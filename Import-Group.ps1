@@ -1,30 +1,32 @@
-#Add-PSSnapin Microsoft.SharePoint.PowerShell -ErrorAction SilentlyContinue
-#Input variables
-#$SourceWebURL = "http://cgfsaudit.cgfsdc.state.sbu/sites/finaudit"
-$TargetWebURL = "http://auditst.cgfsdc.state.sbu/sites/finaudit"
-#In my scenario I will add a SharePoint group as the groups owner but you choose to use a user instead, make sure the user or group is available
-#in the destination site collection
-$ownername = "CGFS Fin Audit Tracking Tool Owners"
-#below define your string on which you filter for the groups to copy. You can choose to copy all groups or create your own filtering. 
-#I filtered for groups which match a certain string. Change this based on your needs.
-#$yourstring = "*something*"
-#Get the Webs
-#$SourceWeb = Get-SPsite $SourceWebURL
-$TargetWeb= Get-SPWeb $TargetWebURL
-#$owner = $targetWeb.groups[$ownername]
-#Get the Source groups
-#$SourceGroup = $SourceWeb.rootweb.sitegroups #| where {$_.name -like ($yourstring) }
-#$SourceGroup | Export-Csv -Path .\groups.csv
+$TargetURL = ""
+$TargetWeb = Get-SPWeb $TargetURL
 
-$SourceGroup = Import-CsV -Path .\groups.csv
+$ownername = "Fin Audit Owners"
+$owner = $targetWeb.groups[$ownername]
 
-foreach ($group in $SourceGroup)
-{
- $TargetWeb.SiteGroups.Add($group.Name, $owner, $null, $group.description)
- $destinationGroup = $TargetWeb.SiteGroups["$Group"]
- $destinationGroup.owner = $owner
- $destinationGroup.Update()
- $groupUsers = Import-Csv -Path .\groupUsers\ + $group.Name.ToString() + .csv
- foreach ($user in $groupUsers){$TargetWeb.SiteGroups["$Group"].AddUser($user)}
- $destinationGroup.Update()
+
+$sourcegroups = Import-Csv .\groups.csv
+
+foreach ($group in $sourcegroups) {
+  # Write-Output $group.Name
+  if ($TargetWeb.SiteGroups[$group.Name] -ne $null) { 
+      write-Host $group.Name " Group exists Already!" -ForegroundColor Red
+  } else {
+    $TargetWeb.SiteGroups.add($group.Name, $owner, $TargetWeb.site.owner, $group.description)
+  }
+}
+
+
+$usergroupmembers = Import-Csv ./usergroupmembers.csv
+
+foreach ($user in $usergroupmembers) {
+    Write-Output $user.LoginName
+    $veruser = $TargetWeb.EnsureUser($user.LoginName)
+    if ($veruser -ne $null) {
+
+        $group = $TargetWeb.SiteGroups[$user.Group]
+        #Write-Output $group
+        $group.AddUser($veruser)
+    }
+   
 }
