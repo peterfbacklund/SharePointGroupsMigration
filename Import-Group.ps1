@@ -1,7 +1,7 @@
 $TargetURL = ""
 $TargetWeb = Get-SPWeb $TargetURL
 
-$ownername = "Fin Audit Owners"
+$ownername = "Financial Audit Site Owners"
 $owner = $targetWeb.groups[$ownername]
 
 
