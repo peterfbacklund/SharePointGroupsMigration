@@ -1,6 +1,6 @@
 #Add-PSSnapin Microsoft.SharePoint.PowerShell -ErrorAction SilentlyContinue
 #Input variables
-$WebURL = "http://cgfsaudit.cgfsdc.state.sbu/sites/finaudit"
+$WebURL = "http://cgfs13index1dev/"
 
 $Web = Get-SPWeb $WebURL
   
