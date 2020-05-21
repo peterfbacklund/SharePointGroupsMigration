@@ -48,7 +48,7 @@ foreach ($role in $grouproles) {
          Write-Output $role.Group
         $siteGroup = $TargetWeb.SiteGroups[$role.Group]  
         $roleAssignment = new-object Microsoft.SharePoint.SPRoleAssignment($sitegroup) 
-        $roleDefinition = $web.Site.RootWeb.RoleDefinitions[$role.Name]  
+        $roleDefinition = $TargetWeb.Site.RootWeb.RoleDefinitions[$role.Name]  
         #Write-Output $roleDefinition
         $roleAssignment.RoleDefinitionBindings.Add($roleDefinition)
         $TargetWeb.RoleAssignments.Add($roleAssignment)  
